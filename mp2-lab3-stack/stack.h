@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-
+#define MAX_STACK_SIZE 1000
 
 using namespace std;
 template <class T>
@@ -9,7 +9,7 @@ class TStack {
 	int MaxSize, TopNum;
 	T* pStack;
 public:
-	TStack(int s = 10);
+	TStack(int s = MAX_STACK_SIZE);
 	TStack(const TStack& st);
 	~TStack();
 	int GetSize() { return MaxSize; }
@@ -37,7 +37,7 @@ public:
 	{
 		for (int i = 0; i < st.TopNum; i++)
 			out << st.pStack[i] << ' ';
-		return out;
+		return out;   
 	}
 };
 
@@ -57,9 +57,9 @@ TStack<T>::TStack(const TStack& st)
 {
 	MaxSize = st.MaxSize;
 	TopNum = st.TopNum;
-	pMem = new T[MaxSize];
+	pStack = new T[MaxSize];
 	for (int i = 0; i < TopNum; i++)
-		pMem[i] = st.pStack[i];
+		pStack[i] = st.pStack[i];
 }
 
 template<class T>

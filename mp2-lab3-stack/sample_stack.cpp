@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include "stack.h"
-
+#include "calc.h"
 using namespace std;
 
 bool Check(string str) {
@@ -17,11 +17,30 @@ bool Check(string str) {
 	return true;
 }
 
+/*
+строка содержит операнды: целые/вещественные числа.
+В крайнем случае обозначения переменных(а,b,c), в которых позже подставляется число
+Сложение, вычитание, умножение,деление, возведение в степень
+Более сложное: использование функций (синус, косинус, экспонента)
+скобки, считаем их одного вида. '( )'
+
+Задача:Нужно посчитать значение выражения.
+
+Вид: консольное приложение, в котором вводится ариф. выражение и выдаётся ответ
+
+*/
 void main()
 {
-	
+
 	setlocale(LC_ALL, "Russian");
-	cout << "Тестирование программ проверки правильности расстановки скобок" << endl;
-
-
+	setlocale(LC_NUMERIC, "C");
+	string str;
+	cout << "Введите арифметическое выражение:" << endl;
+	cin >> str;
+	TCalc calc;
+	calc.SetInfix(str);
+	/*calc.ToPostfix();
+	cout << calc.GetPostfix() << endl;*/
+	cout << calc.Calcul() << endl;
 }
+
