@@ -3,6 +3,10 @@
 #include "stack.h"
 using namespace std;
 
+enum Opers {
+	openbr, unarMns, pls, mns, mlt, dv, pw, sn
+};
+
 class TCalc
 {
 	string infix;
@@ -21,4 +25,6 @@ public:
 	void ToPostfix();
 	double CalcPostfix(); //
 	double Calcul(); // вычислить арифм. выражение за 1 проход
+
+
 };

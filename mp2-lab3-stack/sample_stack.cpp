@@ -42,5 +42,6 @@ void main()
 	/*calc.ToPostfix();
 	cout << calc.GetPostfix() << endl;*/
 	cout << calc.Calcul() << endl;
+
 }
 

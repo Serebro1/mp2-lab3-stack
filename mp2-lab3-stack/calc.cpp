@@ -137,7 +137,7 @@ double TCalc::Calcul()
 			while (Prior(StChar.Top()) >= Prior(str[i])) {
 				double leftOp = StNum.Pop();
 				double rightOp = StNum.Pop();
-				switch (tmp)
+				switch (StChar.Pop())
 				{
 				case '+':
 					StNum.Push(leftOp + rightOp);
