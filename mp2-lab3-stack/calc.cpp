@@ -51,15 +51,58 @@ double TCalc::CalcPostfix()
 	return res;
 }
 
-int TCalc::Prior(char op)
+int TCalc::Prior(const char* op)
 {
 	// на switch-case переделать
-	if (op == '+' || op == '-') return 1;
-	else if (op == '*' || op == '/') return 2;
-	else if (op == '^') return 3;
+	char oper = *op;
+	if (oper == '+' || oper == '-') return 1;
+	else if (oper == '*' || oper == '/') return 2;
+	else if (oper == '^') return 3;
+	else if (*(op - 1) == '(' || *(op + 1) == '(')
+		return 4;
 	return 0;
 }
 
+int TCalc::Prior(const Opers& op)
+{
+	switch (op)
+	{
+	case pls: case mns:
+		return 1;
+	case mlt: case dv:
+		return 2;
+	case pw:
+		return 3;
+	case sn: case unarMns: case cs:
+		return 4;
+	default:
+		return 0;
+	}
+}
+Opers TCalc::transform(const char* c)
+{
+	switch (*c)
+	{
+	case '+':
+		return pls;
+	case '-':
+		if (*(c-1) == '(')
+			return unarMns;
+		return mns;
+	case '*':
+		return mlt;
+	case '/':
+		return dv;
+	case '^':
+		return pw;
+	case 'S':
+		return sn;
+	case 'C':
+		return cs;
+	default:
+		break;
+	}
+}
 void TCalc::ToPostfix()
 {
 	postfix = "";
@@ -86,7 +129,8 @@ void TCalc::ToPostfix()
 		else
 		{
 			postfix += ' ';
-			while (Prior(StChar.Top()) >= Prior(tmp))
+			const char tmp2 = StChar.Top();
+			while (Prior(&tmp2) >= Prior(&tmp))
 			{
 				postfix += StChar.Pop();
 				postfix += ' ';
@@ -120,12 +164,13 @@ double TCalc::Calcul()
 * 
 */
 	StNum.Clear();
-	StChar.Clear();
+	StOpers.Clear();
 	string str = '(' + infix + ')';
 	for (int i = 0; i < str.size(); i++)
 	{
 		char tmp = str[i];
-		if (tmp == '(') StChar.Push(tmp);
+		if (tmp == '(') StOpers.Push(openbr);
+		else if (tmp == 'p') StNum.Push(2 * acos(0.0));
 		else if (tmp >= '0' && tmp <= '9' || tmp == '.' || tmp == ',') {
 			if (tmp == ',') tmp = '.';
 			size_t idx;
@@ -133,57 +178,85 @@ double TCalc::Calcul()
 			StNum.Push(num);
 			i += idx - 1;
 		}
-		else if (tmp == '+' || tmp == '-' || tmp == '*' || tmp == '/' || tmp == '^') {
-			while (Prior(StChar.Top()) >= Prior(str[i])) {
-				double leftOp = StNum.Pop();
-				double rightOp = StNum.Pop();
-				switch (StChar.Pop())
+		else if (tmp == '+' || tmp == '-' || tmp == '*' || tmp == '/' || tmp == '^' || tmp == 'S' || tmp == 'C') {
+			while (Prior(StOpers.Top()) >= Prior(&str[i])) {
+				double leftOp, rightOp;
+				switch (StOpers.Pop())
 				{
-				case '+':
+				case pls:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();
 					StNum.Push(leftOp + rightOp);
 					break;
-				case '-':
+				case mns:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();
 					StNum.Push(leftOp - rightOp);
 					break;
-				case '*':
+				case mlt:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();
 					StNum.Push(leftOp * rightOp);
 					break;
-				case '/':
+				case dv:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();;
 					if (rightOp == 0.0) throw - 2;
 					StNum.Push(leftOp / rightOp);
 					break;
-				case '^':
+				case pw:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();
 					StNum.Push(pow(leftOp, rightOp));
+					break;
+				case unarMns:
+					StNum.Push(0.0 - StNum.Pop());
+					break;
+				case sn:
+					StNum.Push(sin(StNum.Pop()));
+					break;
+				case cs:
+					StNum.Push(cos(StNum.Pop()));
 					break;
 				}
 			}
-			StChar.Push(tmp);
+			StOpers.Push(transform(&str[i]));
 		}
 		else if (tmp == ')') {
-			char top = StChar.Pop();
-			while (top != '(') {
-				double rightOp = StNum.Pop();
-				double leftOp = StNum.Pop();
+			Opers top = StOpers.Pop();
+			while (top != openbr) {
+				double rightOp;
+				double leftOp;
 				switch (top)
 				{
-				case '+':
+				case pls:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();
 					StNum.Push(leftOp + rightOp);
 					break;
-				case '-':
+				case mns:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();
 					StNum.Push(leftOp - rightOp);
 					break;
-				case '*':
+				case mlt:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();
 					StNum.Push(leftOp * rightOp);
 					break;
-				case '/':
+				case dv:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();
 					if (rightOp == 0.0) throw - 2;
 					StNum.Push(leftOp / rightOp);
 					break;
-				case '^':
+				case pw:
+					rightOp = StNum.Pop(), leftOp = StNum.Pop();
+
 					StNum.Push(pow(leftOp, rightOp));
 					break;
+				case unarMns:
+					StNum.Push(0.0 - StNum.Pop());
+					break;
+				case sn:
+					StNum.Push(sin(StNum.Pop()));
+					break;
+				case cs:
+					StNum.Push(cos(StNum.Pop()));
+					break;
 				}
-				top = StChar.Pop();
+				top = StOpers.Pop();
 			}
 		}
 	}
@@ -192,3 +265,5 @@ double TCalc::Calcul()
 	if (!StNum.isEmpty()) throw - 2;
 	return res;
 }
+
+

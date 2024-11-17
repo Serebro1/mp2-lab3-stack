@@ -133,6 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gtest-all.cc" />
+    <ClCompile Include="test_calc.cpp" />
     <ClCompile Include="test_main.cpp" />
     <ClCompile Include="test_tstack.cpp" />
   </ItemGroup>

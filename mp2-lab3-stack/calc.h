@@ -4,7 +4,7 @@
 using namespace std;
 
 enum Opers {
-	openbr, unarMns, pls, mns, mlt, dv, pw, sn
+	openbr, unarMns, pls, mns, mlt, dv, pw, sn, cs
 };
 
 class TCalc
@@ -13,6 +13,7 @@ class TCalc
 	string postfix;
 	TStack<double> StNum;
 	TStack<char> StChar;
+	TStack<Opers> StOpers;
 public:
 	TCalc();
 	// set, get для тестов
@@ -21,10 +22,12 @@ public:
 	string GetInfix() { return infix; }
 	string GetPostfix() { return postfix; }
 
-	int Prior(char op);
+	int Prior(const char* op);
+	int Prior(const Opers& op);
 	void ToPostfix();
 	double CalcPostfix(); //
 	double Calcul(); // вычислить арифм. выражение за 1 проход
 
+	Opers transform(const char* c);
 
 };
