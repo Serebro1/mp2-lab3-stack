@@ -4,7 +4,7 @@
 using namespace std;
 
 enum Opers {
-	openbr, unarMns, pls, mns, mlt, dv, pw, sn, cs
+	openbr, unarMns, pls, mns, mlt, dv, pw, sn, cs, tn
 };
 
 class TCalc
@@ -27,7 +27,7 @@ public:
 	void ToPostfix();
 	double CalcPostfix(); //
 	double Calcul(); // вычислить арифм. выражение за 1 проход
-
+	void Check(string str); // проверка скобок?
 	Opers transform(const char* c);
 
 };

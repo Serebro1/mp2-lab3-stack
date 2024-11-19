@@ -1,9 +1,10 @@
 #include "calc.h"
 #include <string>
 TCalc::TCalc()
-{
+{ // зачем если по умолчанию стек создаётся с этой константой?
 	StNum = TStack<double>(MAX_STACK_SIZE);
 	StChar = TStack<char>(MAX_STACK_SIZE);
+	StOpers = TStack<Opers>(MAX_STACK_SIZE);
 }
 // считаем что операции и операнды разделены пробелом
 // Считаем что в строке только цифры
@@ -58,7 +59,7 @@ int TCalc::Prior(const char* op)
 	if (oper == '+' || oper == '-') return 1;
 	else if (oper == '*' || oper == '/') return 2;
 	else if (oper == '^') return 3;
-	else if (*(op - 1) == '(' || *(op + 1) == '(')
+	else if (*(op - 1) == '(' || oper == 's' || oper == 't' || oper == 'c')
 		return 4;
 	return 0;
 }
@@ -73,7 +74,7 @@ int TCalc::Prior(const Opers& op)
 		return 2;
 	case pw:
 		return 3;
-	case sn: case unarMns: case cs:
+	case unarMns: case cs: case sn: case tn:
 		return 4;
 	default:
 		return 0;
@@ -95,12 +96,19 @@ Opers TCalc::transform(const char* c)
 		return dv;
 	case '^':
 		return pw;
-	case 'S':
-		return sn;
-	case 'C':
-		return cs;
-	default:
+	case 's':
+		if (*(c + 1) == 'i' && *(c + 2) == 'n')
+			return sn;
 		break;
+	case 'c':
+		if (*(c + 1) == 'o' && *(c + 2) == 's')
+			return cs;
+		break;
+	case 't':
+		if (*(c + 1) == 'a' && *(c + 2) == 'n')
+			return tn;
+	default:
+		throw - 1;
 	}
 }
 void TCalc::ToPostfix()
@@ -156,12 +164,7 @@ double TCalc::Calcul()
 * 5) по завершению алогоритма стек операций должен быть пусть, а в стеке чисел должно быть 1 число
 * 6) Исключение пустого стека чисел или стека
 * 7) унарный минус обработать 2+(-3) корректна или (-3+4)
-* 8) реализовать функции. Как вариант через enum
-* функции с открывающей скобкой добавляются в стек
-* при закрываюшей скобке, есил вытолкнули функцию, то соответствующую функцию надо применить
-* В качестве костыля складывать символы. А лучше создать перечислимый тип(enum) и складывать переменные перечислимого типа, по типу openBrace - '(', plus, minus, mul, divи т.д.
-* Проверять посимвольно но заносить в стек через enum
-* 
+* 8) реализовать функции.
 */
 	StNum.Clear();
 	StOpers.Clear();
@@ -170,7 +173,7 @@ double TCalc::Calcul()
 	{
 		char tmp = str[i];
 		if (tmp == '(') StOpers.Push(openbr);
-		else if (tmp == 'p') StNum.Push(2 * acos(0.0));
+		else if (str[i] == 'p' && str[i + 1] == 'i') StNum.Push(2 * acos(0.0));
 		else if (tmp >= '0' && tmp <= '9' || tmp == '.' || tmp == ',') {
 			if (tmp == ',') tmp = '.';
 			size_t idx;
@@ -178,7 +181,7 @@ double TCalc::Calcul()
 			StNum.Push(num);
 			i += idx - 1;
 		}
-		else if (tmp == '+' || tmp == '-' || tmp == '*' || tmp == '/' || tmp == '^' || tmp == 'S' || tmp == 'C') {
+		else if (tmp == '+' || tmp == '-' || tmp == '*' || tmp == '/' || tmp == '^' || tmp == 's' || tmp == 'c' || tmp == 't') {
 			while (Prior(StOpers.Top()) >= Prior(&str[i])) {
 				double leftOp, rightOp;
 				switch (StOpers.Pop())
@@ -197,7 +200,7 @@ double TCalc::Calcul()
 					break;
 				case dv:
 					rightOp = StNum.Pop(), leftOp = StNum.Pop();;
-					if (rightOp == 0.0) throw - 2;
+					if (rightOp == 0.0) throw - 2; // более правильно было бы через epsilon
 					StNum.Push(leftOp / rightOp);
 					break;
 				case pw:
@@ -213,9 +216,12 @@ double TCalc::Calcul()
 				case cs:
 					StNum.Push(cos(StNum.Pop()));
 					break;
+				case tn:
+					StNum.Push(tan(StNum.Pop()));
+					break;
 				}
 			}
-			StOpers.Push(transform(&str[i]));
+			StOpers.Push(transform(&str[i])); // функция которая будет пушить разные математические функции?
 		}
 		else if (tmp == ')') {
 			Opers top = StOpers.Pop();
@@ -243,7 +249,6 @@ double TCalc::Calcul()
 					break;
 				case pw:
 					rightOp = StNum.Pop(), leftOp = StNum.Pop();
-
 					StNum.Push(pow(leftOp, rightOp));
 					break;
 				case unarMns:
@@ -266,4 +271,15 @@ double TCalc::Calcul()
 	return res;
 }
 
-
+void TCalc::Check(string str)
+{
+	TStack<char> stack(str.length());
+	for (int i = 0; i < str.length(); i++)
+	{
+		if (str[i] == '(') stack.Push('(');
+		if (str[i] == ')')
+			if (stack.isEmpty()) throw -2;
+			else stack.Pop();
+	}
+	if (!stack.isEmpty()) throw -2;
+}
