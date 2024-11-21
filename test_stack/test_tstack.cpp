@@ -27,6 +27,24 @@ TEST(TStack, copied_stack_is_equal_to_source_one)
 	TStack<int> b(a);
 	EXPECT_EQ(a, b);
 }
+
+TEST(TStack, compare_equal_stacks_return_true)
+{
+	const int size = 5;
+	TStack<int> v1(size), v2(size);
+	v2 = v1;
+	ASSERT_TRUE(v2 == v1);
+	EXPECT_EQ(v1, v2);
+}
+
+TEST(TStack, compare_matrix_with_itself_return_true)
+{
+	const int size = 2;
+	TStack<int> v1(size);
+	EXPECT_EQ(v1, v1);
+}
+
+
 TEST(TStack, stacks_with_different_size_are_not_equal)
 {
 	TStack<int> a(10);

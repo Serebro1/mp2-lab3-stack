@@ -18,7 +18,7 @@ double TCalc::CalcPostfix()
 		char c = postfix[i];
 		if (c >= '0' && c <= '9' || c == '.') {
 			size_t idx;
-			double num = stod(&postfix[i], &idx);
+			double num = std::stod(&postfix[i], &idx);
 			StNum.Push(num);
 			i += idx - 1;
 		}
@@ -115,7 +115,7 @@ void TCalc::ToPostfix()
 {
 	postfix = "";
 	StChar.Clear();
-	string tmpStr = '(' + infix + ')';
+	std::string tmpStr = '(' + infix + ')';
 	for (int i = 0; i < tmpStr.size(); i++)
 	{
 		char tmp = tmpStr[i];
@@ -168,7 +168,7 @@ double TCalc::Calcul()
 */
 	StNum.Clear();
 	StOpers.Clear();
-	string str = '(' + infix + ')';
+	std::string str = '(' + infix + ')';
 	for (int i = 0; i < str.size(); i++)
 	{
 		char tmp = str[i];
@@ -177,7 +177,7 @@ double TCalc::Calcul()
 		else if (tmp >= '0' && tmp <= '9' || tmp == '.' || tmp == ',') {
 			if (tmp == ',') tmp = '.';
 			size_t idx;
-			double num = stod(&str[i], &idx);
+			double num = std::stod(&str[i], &idx);
 			StNum.Push(num);
 			i += idx - 1;
 		}
@@ -271,7 +271,7 @@ double TCalc::Calcul()
 	return res;
 }
 
-void TCalc::Check(string str)
+void TCalc::Check(std::string str)
 {
 	TStack<char> stack(str.length());
 	for (int i = 0; i < str.length(); i++)

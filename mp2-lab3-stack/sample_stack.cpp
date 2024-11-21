@@ -2,7 +2,7 @@
 #include <string>
 #include "stack.h"
 #include "calc.h"
-using namespace std;
+
 /*
 строка содержит операнды: целые/вещественные числа.
 В крайнем случае обозначения переменных(а,b,c), в которых позже подставляется число
@@ -20,14 +20,14 @@ void main()
 
 	setlocale(LC_ALL, "Russian");
 	setlocale(LC_NUMERIC, "C");
-	string str;
-	cout << "Введите арифметическое выражение:" << endl;
-	cin >> str;
+	std::string str;
+	std::cout << "Введите арифметическое выражение:" << std::endl;
+	std::cin >> str;
 	TCalc calc;
 	calc.SetInfix(str);
 	/*calc.ToPostfix();
 	cout << calc.GetPostfix() << endl;*/
-	cout << calc.Calcul() << endl;
+	std::cout << calc.Calcul() << std::endl;
 
 }
 

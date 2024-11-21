@@ -2,7 +2,6 @@
 #include <iostream>
 #define MAX_STACK_SIZE 1000
 
-using namespace std;
 template <class T>
 class TStack {
 
@@ -27,13 +26,13 @@ public:
 	T Top() const { return pStack[TopNum]; }
 
 	void Clear() { TopNum = -1; }
-	friend istream& operator>>(istream& in, TStack& st)
+	friend std::istream& operator>>(std::istream& in, TStack& st)
 	{
 		for (int i = 0; i < st.TopNum + 1; i++)
 			in >> st.pStack[i];
 		return in;
 	}
-	friend ostream& operator<<(ostream& out, const TStack& st)
+	friend std::ostream& operator<<(std::ostream& out, const TStack& st)
 	{
 		for (int i = 0; i < st.TopNum + 1; i++)
 			out << st.pStack[i] << ' ';
@@ -45,7 +44,7 @@ template<class T>
 TStack<T>::TStack(int _MaxSize)
 {
 	if (_MaxSize < 0)
-		throw out_of_range("Invalid stack size");
+		throw std::out_of_range("Invalid stack size");
 	MaxSize = _MaxSize;
 	TopNum = -1;
 	pStack = new T[MaxSize];
@@ -119,3 +118,13 @@ void TStack<T>::Push(const T& val)
 	pStack[++TopNum] = val;
 }
 
+
+
+
+/*
+* 2 стека на 1 массиве
+* оба стека сходятся друг к другу при заполнении с обоих концов
+* Сама задача довольно актуальна, о размещении будь то стеков или очередей на 1 массиве
+* это позволяет экономно использовать память
+* 
+*/
