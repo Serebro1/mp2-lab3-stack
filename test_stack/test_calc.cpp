@@ -76,6 +76,22 @@ TEST(TCalc, can_calculate_sin_function) {
 	calc.SetInfix(expression);
 	EXPECT_EQ(calc.Calcul(), 2);
 }
+TEST(TCalc, can_calculate_cos_function) {
+	std::string expression = "1.0+cos(pi/2.0)";
+
+	TCalc calc;
+
+	calc.SetInfix(expression);
+	EXPECT_EQ(calc.Calcul(), 1);
+}
+TEST(TCalc, can_calculate_tan_function) {
+	std::string expression = "1.0+tan(0)";
+
+	TCalc calc;
+
+	calc.SetInfix(expression);
+	EXPECT_EQ(calc.Calcul(), 1);
+}
 
 TEST(TCalc, can_calculate_pow_function) {
 	std::string expression = "3+3^(1/2)";
@@ -87,7 +103,7 @@ TEST(TCalc, can_calculate_pow_function) {
 }
 
 TEST(TCalc, throw_when_expression_with_wrong_function) {
-	std::string expression = "1+sn(p/2)";
+	std::string expression = "1+sin(p/2)";
 
 	TCalc calc;
 

@@ -54,14 +54,32 @@ double TCalc::CalcPostfix()
 
 int TCalc::Prior(const char* op)
 {
-	// на switch-case переделать
-	char oper = *op;
-	if (oper == '+' || oper == '-') return 1;
-	else if (oper == '*' || oper == '/') return 2;
-	else if (oper == '^') return 3;
-	else if (*(op - 1) == '(' || oper == 's' || oper == 't' || oper == 'c')
+	switch (*op)
+	{
+	case '+':
+		return 1;
+	case '-':
+		if (*(op - 1) == '(')
+			return 4;
+		return 1;
+	case '*': case'/':
+		return 2;
+	case '^':
 		return 4;
-	return 0;
+	case 's':
+		if (*(op + 1) == 'i' && *(op + 2) == 'n')
+			return 4;
+		break;
+	case 'c':
+		if (*(op + 1) == 'o' && *(op + 2) == 's')
+			return 4;
+		break;
+	case 't':
+		if (*(op + 1) == 'a' && *(op + 2) == 'n')
+			return 4;
+	default:
+		return 0;
+	}
 }
 
 int TCalc::Prior(const Opers& op)
@@ -87,7 +105,7 @@ Opers TCalc::transform(const char* c)
 	case '+':
 		return pls;
 	case '-':
-		if (*(c-1) == '(')
+		if (*(c - 1) == '(')
 			return unarMns;
 		return mns;
 	case '*':
@@ -97,18 +115,18 @@ Opers TCalc::transform(const char* c)
 	case '^':
 		return pw;
 	case 's':
-		if (*(c + 1) == 'i' && *(c + 2) == 'n')
+		if (*(c + 1) == 'i' && *(c + 2) == 'n' && *(c + 3) == '(')
 			return sn;
 		break;
 	case 'c':
-		if (*(c + 1) == 'o' && *(c + 2) == 's')
+		if (*(c + 1) == 'o' && *(c + 2) == 's' && *(c + 3) == '(')
 			return cs;
 		break;
 	case 't':
-		if (*(c + 1) == 'a' && *(c + 2) == 'n')
+		if (*(c + 1) == 'a' && *(c + 2) == 'n' && *(c + 3) == '(')
 			return tn;
 	default:
-		throw - 1;
+		throw - 3;
 	}
 }
 void TCalc::ToPostfix()
@@ -127,7 +145,7 @@ void TCalc::ToPostfix()
 				postfix += top;
 				postfix += ' ';
 				top = StChar.Pop();
-				
+
 			}
 		}
 		else if (tmp >= '0' && tmp <= '9' || tmp == '.' || tmp == ',') {
@@ -145,27 +163,27 @@ void TCalc::ToPostfix()
 			}
 
 			StChar.Push(tmp);
-			
+
 		}
 	}
 }
 
 double TCalc::Calcul()
 {
-/*
-* сразу считаем в инфиксной форме
-* Пример: 1.1/(2+3*(4-5)^6)+7/8
-* Постфиксная запись: 1.1 2 3 4 5 - 6 ^ * + / 7 8 / +
-* Записи
-* 1) Если видимо число, заносим в стек чисел
-* 2) В стеке операции у нас начинается с открытой скобкой.
-* 3) Операция - в стек по приоритету
-* 4) ')' - выталкиваем все операции до ')' и считаем
-* 5) по завершению алогоритма стек операций должен быть пусть, а в стеке чисел должно быть 1 число
-* 6) Исключение пустого стека чисел или стека
-* 7) унарный минус обработать 2+(-3) корректна или (-3+4)
-* 8) реализовать функции.
-*/
+	/*
+	* сразу считаем в инфиксной форме
+	* Пример: 1.1/(2+3*(4-5)^6)+7/8
+	* Постфиксная запись: 1.1 2 3 4 5 - 6 ^ * + / 7 8 / +
+	* Записи
+	* 1) Если видимо число, заносим в стек чисел
+	* 2) В стеке операции у нас начинается с открытой скобкой.
+	* 3) Операция - в стек по приоритету
+	* 4) ')' - выталкиваем все операции до ')' и считаем
+	* 5) по завершению алогоритма стек операций должен быть пусть, а в стеке чисел должно быть 1 число
+	* 6) Исключение пустого стека чисел или стека
+	* 7) унарный минус обработать 2+(-3) корректна или (-3+4)
+	* 8) реализовать функции.
+	*/
 	StNum.Clear();
 	StOpers.Clear();
 	std::string str = '(' + infix + ')';
@@ -265,7 +283,8 @@ double TCalc::Calcul()
 			}
 		}
 	}
-	if (StNum.isEmpty()) throw - 1;
+	if (!StOpers.isEmpty()) throw - 2;
+	if (StNum.isEmpty()) throw - 2;
 	double res = StNum.Pop();
 	if (!StNum.isEmpty()) throw - 2;
 	return res;
@@ -278,8 +297,8 @@ void TCalc::Check(std::string str)
 	{
 		if (str[i] == '(') stack.Push('(');
 		if (str[i] == ')')
-			if (stack.isEmpty()) throw -2;
+			if (stack.isEmpty()) throw - 2;
 			else stack.Pop();
 	}
-	if (!stack.isEmpty()) throw -2;
+	if (!stack.isEmpty()) throw - 2;
 }
